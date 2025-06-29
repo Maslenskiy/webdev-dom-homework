@@ -66,120 +66,155 @@
   </body>
 
   <script>
-    "use strict";
-    const inputNameEllement = document.getElementById('input-name');
-    const inputComment = document.getElementById('input-comment');
-    const formButton = document.getElementById('form-button');
-    const listComments = document.getElementById('comments');
+"use strict";
+const inputNameElement = document.getElementById('input-name');
+const inputCommentElement = document.getElementById('input-comment');
+const formButton = document.getElementById('form-button');
+const listComments = document.getElementById('comments');
 
-    const dataListComments = [
-      {name:"Глеб Фокин",date:"12.02.22 12:18",comment:'Это будет первый комментарий на этой странице',likes:3, isLikes:false},
-      {name:"Варвара Н.", date:"13.02.22 19:22",comment:"Мне нравится как оформлена эта страница! ❤",likes:75, isLikes:true}
-    ]
+const dataListComments = [
+  {name: "Глеб Фокин", date: "12.02.22 12:18", comment: 'Это будет первый комментарий на этой странице', likes: 3, isLiked: false},
+  {name: "Варвара Н.", date: "13.02.22 19:22", comment: "Мне нравится как оформлена эта страница! ❤", likes: 75, isLiked: true}
+];
+
+// Функция для безопасного отображения текста
+function sanitizeText(text) {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// Функция для форматирования цитат (сохраняем > для цитирования)
+function formatCommentText(text) {
+  // Разделяем текст на строки
+  const lines = text.split('\n');
   
-    function getDate (){
-     const date = new Date()
-     const day = String(date.getDate()).padStart(2, '0');
-     const month = String(date.getMonth() + 1).padStart(2, '0'); 
-     const year = String(date.getFullYear()).slice(-2); 
-     const hours = String(date.getHours()).padStart(2, '0');
-     const minutes = String(date.getMinutes()).padStart(2, '0');
-
-    return `${day}.${month}.${year} ${hours}:${minutes}`;
+  // Обрабатываем каждую строку
+  return lines.map(line => {
+    // Если строка начинается с >, оставляем как есть (но экранируем остальное)
+    if (line.startsWith('>')) {
+      return '&gt;' + sanitizeText(line.substring(1));
     }
+    // Иначе полностью экранируем строку
+    return sanitizeText(line);
+  }).join('<br>'); // Объединяем строки с <br> для переносов
+}
 
-    const renderComments = () =>{
-      listComments.innerHTML = dataListComments.map((comment,index)=>{
-        return `<li class="comment" data-index="${index}">
-          <div class="comment-header">
-            <div>${comment.name}</div>
-            <div>${comment.date}</div>
-          </div>
-          <div class="comment-body">
-            <div class="comment-text">
-              ${comment.comment}
-            </div>
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">${comment.likes}</span>
-              <button class="like-button${comment.isLiked ? " -active-like" : ""}"></button>
-            </div>
-          </div>
-        </li>`
-      }).join('')
-      initLikeButtons()
-    }
-    renderComments()
+function getCurrentDate() {
+  const now = new Date();
+  const day = String(now.getDate()).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const year = String(now.getFullYear()).slice(-2);
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
 
-   function initLikeButtons() {
-      const likeButtons = document.querySelectorAll('.like-button');
-      
-      likeButtons.forEach((button, index) => {
-        button.addEventListener('click', () => {
-          // Изменяем состояние лайка в массиве данных
-          dataListComments[index].isLiked = !dataListComments[index].isLiked;
-          
-          // Обновляем счетчик лайков
-          if (dataListComments[index].isLiked) {
-            dataListComments[index].likes++;
-          } else {
-            dataListComments[index].likes--;
-          }
-          
-          // Перерисовываем комментарии
-          renderComments();
-        });
-      });
-    }
-    function validationInputs(){
-      const name = inputNameEllement.value.trim();
-      const comment = inputComment.value.trim();
+  return `${day}.${month}.${year} ${hours}:${minutes}`;
+}
 
-      // Сбрасываем предыдущие ошибки
-     inputNameEllement.classList.remove('error');
-      inputComment.classList.remove('error');
-      let hasError = false;
+function renderComments() {
+  listComments.innerHTML = dataListComments.map((comment, index) => `
+    <li class="comment" data-index="${index}">
+      <div class="comment-header">
+        <div>${sanitizeText(comment.name)}</div>
+        <div>${comment.date}</div>
+      </div>
+      <div class="comment-body">
+        <div class="comment-text">
+          ${formatCommentText(comment.comment)}
+        </div>
+      </div>
+      <div class="comment-footer">
+        <div class="likes">
+          <span class="likes-counter">${comment.likes}</span>
+          <button class="like-button ${comment.isLiked ? '-active-like' : ''}"></button>
+        </div>
+      </div>
+    </li>
+  `).join('');
 
-      if (!name) {
-        inputNameEllement.classList.add('error');
-        hasError = true;
+  initEventListeners();
+}
+
+function initEventListeners() {
+  // Обработчики для комментариев
+  document.querySelectorAll('.comment').forEach(commentEl => {
+    commentEl.addEventListener('click', function(e) {
+      if (!e.target.closest('.like-button')) {
+        const index = this.dataset.index;
+        const comment = dataListComments[index];
+        inputCommentElement.value = `> ${comment.name}: ${comment.comment}\n`;
+        inputCommentElement.focus();
       }
+    });
+  });
 
-      if (!comment) {
-        inputComment.classList.add('error');
-        hasError = true;
-      }
+  // Обработчики для лайков
+  document.querySelectorAll('.like-button').forEach((btn, index) => {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      dataListComments[index].isLiked = !dataListComments[index].isLiked;
+      dataListComments[index].likes += dataListComments[index].isLiked ? 1 : -1;
+      renderComments();
+    });
+  });
+}
 
-      if (hasError) {
-          alert('Пожалуйста, заполните все поля.');
-          return;
+function validateForm() {
+  const name = inputNameElement.value.trim();
+  const comment = inputCommentElement.value.trim();
+  let isValid = true;
 
-      } else{
-        renderList()
-        inputNameEllement.value = '';
-        inputComment.value = '';
-      } 
-    }
+  // Сброс предыдущих ошибок
+  inputNameElement.classList.remove('error');
+  inputCommentElement.classList.remove('error');
 
+  if (!name) {
+    inputNameElement.classList.add('error');
+    isValid = false;
+  }
 
-    function renderList(){
-      const newComment = {
-        name: inputNameEllement.value.trim(),
-        date: getDate(),
-        comment: inputComment.value.trim(),
-        likes: 0,
-        isLiked: false
-      };
+  if (!comment) {
+    inputCommentElement.classList.add('error');
+    isValid = false;
+  }
 
-       dataListComments.push(newComment);
-       renderComments();
+  if (!isValid) {
+    alert('Пожалуйста, заполните все поля корректно.');
+    return false;
+  }
 
-      }
+  return true;
+}
 
-    formButton.addEventListener('click', ()=>{  
-      validationInputs()
-    })
+function addNewComment() {
+  if (!validateForm()) return;
+
+  const newComment = {
+    name: inputNameElement.value.trim(),
+    date: getCurrentDate(),
+    comment: inputCommentElement.value.trim(),
+    likes: 0,
+    isLiked: false
+  };
+
+  dataListComments.push(newComment);
+  renderComments();
+
+  // Очистка формы
+  inputNameElement.value = '';
+  inputCommentElement.value = '';
+}
+
+// Инициализация
+formButton.addEventListener('click', function(e) {
+  e.preventDefault();
+  addNewComment();
+});
+
+renderComments();
 
   </script>
 </html>
