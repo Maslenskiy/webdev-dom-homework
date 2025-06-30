@@ -1,12 +1,13 @@
-import {listComments} from './constants.js';
-import {dataListComments} from './dataListComments.js';
-import {sanitizeText} from './utilities/sanitizeText.js';
-import {formatCommentText} from './formatCommentText.js';
-import {initEventListeners} from './initEventListeners.js'
-
+import { listComments } from './constants.js'
+import { dataListComments } from './dataListComments.js'
+import { sanitizeText } from './utilities/sanitizeText.js'
+import { formatCommentText } from './formatCommentText.js'
+import { initEventListeners } from './initEventListeners.js'
 
 export function renderComments() {
-  listComments.innerHTML = dataListComments.map((comment, index) => `
+    listComments.innerHTML = dataListComments
+        .map(
+            (comment, index) => `
     <li class="comment" data-index="${index}">
       <div class="comment-header">
         <div>${sanitizeText(comment.name)}</div>
@@ -24,8 +25,9 @@ export function renderComments() {
         </div>
       </div>
     </li>
-  `).join('');
+  `,
+        )
+        .join('')
 
-  initEventListeners();
+    initEventListeners()
 }
-
