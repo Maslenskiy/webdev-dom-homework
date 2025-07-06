@@ -8,24 +8,7 @@ import {
 import { dataListComments } from "./module/dataListComments.js";
 import { validateForm } from "./module/validateForm.js";
 import { getCurrentDate } from "./module/getCurentDate.js";
-function addNewComment() {
-  if (!validateForm()) return;
-
-  const newComment = {
-    name: inputNameElement.value.trim(),
-    date: getCurrentDate(),
-    comment: inputCommentElement.value.trim(),
-    likes: 0,
-    isLiked: false,
-  };
-
-  dataListComments.push(newComment);
-  renderComments();
-
-  // Очистка формы
-  inputNameElement.value = "";
-  inputCommentElement.value = "";
-}
+import { addNewComment } from "./module/addNewComment.js";
 
 // Инициализация
 formButton.addEventListener("click", function (e) {
