@@ -59,16 +59,6 @@ modules/
    ```
 3. Запустить любой статический сервер (напр. `npx serve` или расширение Live Server) и открыть корень проекта
 
-## Скриншоты / демо
-
-```markdown
-<img width="1914" height="913" alt="Screenshot_35" src="https://github.com/user-attachments/assets/f3f8f043-a0d3-4ea0-991f-da49b85b0e77" />
-<img width="851" height="830" alt="Screenshot_37" src="https://github.com/user-attachments/assets/155c5a63-3124-402e-baa2-5f38663d31a8" />
-<img width="1898" height="900" alt="Screenshot_34" src="https://github.com/user-attachments/assets/70d4f59f-4c24-4ae3-ac9d-6d0945cec1a4" />
-<img width="993" height="909" alt="Screenshot_36" src="https://github.com/user-attachments/assets/027d6b4f-3611-4250-ac00-0f3b72225201" />
-
-```
-
 ## Сроки выполнения
 
 - Структура и дизайн: 3 дня
